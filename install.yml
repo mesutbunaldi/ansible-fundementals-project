@@ -1,0 +1,13 @@
+---
+- hosts: nginx
+  roles:
+    - installNginx
+  
+- hosts: grafana
+  roles:
+    - installGrafana
+
+- hosts: rabbitmq
+  roles:
+    - installRabbitmq
+ 

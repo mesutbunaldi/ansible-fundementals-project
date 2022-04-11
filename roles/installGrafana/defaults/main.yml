@@ -1,0 +1,3 @@
+---
+# defaults file for upgradeNginx
+grafana_default_keyring_path: /usr/share/keyrings/grafana-keyring.gpg

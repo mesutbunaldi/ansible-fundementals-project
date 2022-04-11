@@ -1,0 +1,6 @@
+---
+rabbitmq_default_keyring_path: /usr/share/keyrings/com.rabbitmq.team.gpg
+
+erlang_keyring_path: /usr/share/keyrings/io.cloudsmith.rabbitmq.E495BB49CC4BBE5B.gpg
+
+server_keyring_path: /usr/share/keyrings/io.cloudsmith.rabbitmq.9F4587F226208342.gpg

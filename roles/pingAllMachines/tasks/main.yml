@@ -1,0 +1,19 @@
+---
+- name: Check nginx
+  ansible.builtin.command: nginx -v
+  register: myoutput
+- debug:
+    var: myoutput.stdout_lines
+
+
+
+# - name: ping
+#   ansible.builtin.ping:
+
+
+
+# - name: Store /etc/nginx/ into /etc/nginx-old/ 
+#   ansible.builtin.copy:
+#     src: /etc/nginx/
+#     dest: /etc/nginx-old/
+#     remote_src: yes

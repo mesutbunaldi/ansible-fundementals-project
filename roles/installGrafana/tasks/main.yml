@@ -1,0 +1,44 @@
+---
+# tasks file for install Grafana
+- name : install requirements fot grafana
+  ansible.builtin.package:
+    name:
+      - apt-transport-https
+      - wget
+      - software-properties-common
+    state: present
+
+- name : get grafana gpg.key and add to keyrings folder
+  apt_key: 
+    url: https://packages.grafana.com/gpg.key
+    keyring: "{{ grafana_default_keyring_path }}" 
+    state: present
+
+- name : Add this repository for stable releases
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by={{ grafana_default_keyring_path }}] https://packages.grafana.com/enterprise/deb stable main
+    state: present
+
+- name : Install grafana enterprise
+  apt:
+    update_cache: yes
+    name: grafana-enterprise
+    state: present
+
+- name: daemon reload
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: grafana-server
+    enabled: yes
+
+- name : Start grafana service if not started
+  ansible.builtin.service:
+    name: grafana-server
+    state: started
+
+- name: Allow all access to tcp port 3000
+  community.general.ufw:
+    rule: allow
+    port: '3000'
+    proto: tcp

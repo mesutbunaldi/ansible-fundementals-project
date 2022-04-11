@@ -1,0 +1,75 @@
+---
+- name : install requirements for rabbitmq installation
+  apt:
+    update_cache: yes
+    pkg:
+      - curl
+      - gnupg
+      - apt-transport-https
+
+- name : get rabbitmq main signing key
+  apt_key:
+    url: https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA
+    keyring: "{{ rabbitmq_default_keyring_path }}"
+    state: present
+
+- name : get modern erlang repo
+  apt_key:
+    url: https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/gpg.E495BB49CC4BBE5B.key 
+    keyring: "{{ erlang_keyring_path }}"
+    state: present
+
+- name : packagecloud rabbitmq repository
+  apt_key: 
+    url: https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
+    keyring: "{{ server_keyring_path }}"
+    state: present
+
+- apt_repository: repo='deb [signed-by={{ erlang_keyring_path }}] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/deb/ubuntu {{ ansible_distribution_release }} main'
+- apt_repository: repo='deb-src [signed-by={{ erlang_keyring_path }}] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/deb/ubuntu {{ ansible_distribution_release }} main'
+- apt_repository: repo='deb [signed-by={{ server_keyring_path }}] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/deb/ubuntu {{ ansible_distribution_release }}  main'
+- apt_repository: repo='deb-src [signed-by={{ server_keyring_path }}] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/deb/ubuntu {{ ansible_distribution_release }}  main'
+
+- name : install erlang pkgs
+  apt:
+    update_cache: yes
+    pkg:
+      - erlang-base
+      - erlang-asn1 
+      - erlang-crypto
+      - erlang-eldap
+      - erlang-ftp
+      - erlang-inets
+      - erlang-mnesia
+      - erlang-os-mon
+      - erlang-parsetools
+      - erlang-public-key
+      - erlang-runtime-tools
+      - erlang-snmp
+      - erlang-ssl
+      - erlang-syntax-tools
+      - erlang-tftp
+      - erlang-tools
+      - erlang-xmerl
+
+- name: install rabbitmq server with dependicies
+  apt:
+    name: rabbitmq-server
+    state: fixed
+
+- name : Start rabbitmq service if not started
+  ansible.builtin.service:
+    name: rabbitmq-server
+    state: started
+
+- name: Enable every plugin in list with existing plugins
+  community.rabbitmq.rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+    new_only: 'yes'
+
+- name: Allow all access to tcp port 15672
+  community.general.ufw:
+    rule: allow
+    port: '15672'
+    proto: tcp
